@@ -91,5 +91,8 @@ Antidote needs normally 2 cpus and 2 Gig memory to run.
 The default settings for minikube are around the same value, where the default cluster setup needs at least an eighth.
 
 ### Monitoring
-You may also activate the heapster addon, or others. See [here](https://kubernetes.io/de/docs/tutorials/hello-minikube/#addons-aktivieren) how to do so.
-The heapster addon allows to monitor the kubernetes cluster via grafana.
+Use `minikube dashboard` to monitor the objects and their status that where created in the minikube cluster.
+
+
+You may also activate the heapster addon, or others. See [here](https://kubernetes.io/de/docs/tutorials/hello-minikube/#addons-aktivieren) how to do so.  
+The heapster addon allows to monitor the kubernetes cluster and its pods traffic via grafana.
