@@ -1,6 +1,6 @@
-# Deploying Antidote with Kubernetes
+# Deploying Antidote with Kubernetes 
 
-Here I tested to deploy antidote with kubernetes.
+Here I tested to deploy antidote with kubernetes using only bash scripts and the command line tool [kubectl](https://kubernetes.io/docs/reference/kubectl/overview/) from kubernetes.  
 In the following it will be explained what is possible to do within this repository.
 
 ## Prerequisites
@@ -18,7 +18,7 @@ If you want to build your own images, refere to [docker-antidote](https://github
 
 ### storage
 You have to define a storage class object before deploying any antidote data centers. You can use the script createStorageClass.sh to deploy the storage class template from the resources/templates directory.  
-More information about local storage can be found [here](https://kubernetes.io/blog/2019/04/04/kubernetes-1.14-local-persistent-volumes-ga/)
+More information about local storage can be found [here](https://kubernetes.io/blog/2019/04/04/kubernetes-1.14-local-persistent-volumes-ga/).
 
 ## Deployment
 

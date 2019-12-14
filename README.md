@@ -12,5 +12,5 @@ Antidote repository: https://github.com/AntidoteDB/antidote
 		- kubernetes
 - deployment
 	- kubernetes
-		- nativ
+		- [nativ](https://github.com/Yannick-W/antidote/tree/master/deployment/kubernetes/Nativ)
 		- java client library
