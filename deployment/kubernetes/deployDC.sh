@@ -41,7 +41,6 @@ echo replicas=$NUM_NODES
 ## Create directory for deployment
 if [ ! -d "$DEPLOYMENTS_DIR/$APP_LABEL" ]; then
 	mkdir "$DEPLOYMENTS_DIR/$APP_LABEL"
-	mkdir "$DEPLOYMENTS_DIR/$APP_LABEL/jobs"
 	mkdir "$DEPLOYMENTS_DIR/$APP_LABEL/services_pod-exposer"
 		
 	## add to config TODO...

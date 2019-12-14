@@ -1,88 +1,47 @@
 #!/bin/bash
 
 ### References
-### - ../deployDC.sh
+### - ../connectDCs.sh
 
 ### ---
-### This deploys a job to kubernetes, which will start a container with the image:
-### peterzel/antidote-connect
-### And the arguments:
-### ["--createDc", "${antidote_first_node}", ${antidote_nodes}]
-### The information about the nodes is fetched from the kubernetes cluster.
 ### ---
 
 ## Arguments
-APP_LABEL=$1 # name of the statefulset / datacenter
-SCRIPTS_CONFIG_SRC_DIR=$2
+SCRIPTS_CONFIG_SRC_DIR=$3
+POSTFIX_ID_STR=$2
+ANTIDOTE_SERVERS=$1
+
+echo $SCRIPTS_CONFIG_SRC_DIR
+echo postfix: $POSTFIX_ID_STR
+echo servers: $ANTIDOTE_SERVERS
 
 ## Files
-createDC=go-connector-createDC-template.yaml
+connectDCs=go-connector-connectDCs-template.yaml
 
 ## Dirs
 if [ -z "$SCRIPTS_CONFIG_SRC_DIR" ]; then
-	DEPLOYMENTS_DIR=$(bash getConfig.sh deployments_dir $SCRIPTS_CONFIG_SRC_DIR);
+	RES_DIR=$(bash getConfig.sh resources_dir $SCRIPTS_CONFIG_SRC_DIR);
 	TEMPLATES_DIR=$(bash getConfig.sh templates_dir $SCRIPTS_CONFIG_SRC_DIR);
 else
-	DEPLOYMENTS_DIR=$(bash $SCRIPTS_CONFIG_SRC_DIR/getConfig.sh deployments_dir $SCRIPTS_CONFIG_SRC_DIR);
-	TEMPLATES_DIR=$(bash getConfig.sh templates_dir $SCRIPTS_CONFIG_SRC_DIR);
+	RES_DIR=$(bash $SCRIPTS_CONFIG_SRC_DIR/getConfig.sh resources_dir $SCRIPTS_CONFIG_SRC_DIR);
+	TEMPLATES_DIR=$(bash $SCRIPTS_CONFIG_SRC_DIR/getConfig.sh templates_dir $SCRIPTS_CONFIG_SRC_DIR);
 fi
-
-DEPLOYMENT_DIR=$DEPLOYMENTS_DIR/$APP_LABEL;
-
 
 ## Begin
+JOBS_DIR="$RES_DIR/jobs"
 
-if [ ! -d $DEPLOYMENT_DIR ]; then
-	echo Could not find $DEPLOYMENT_DIR. Exiting. 
-	exit;
-fi
+## create connector ressource to connect this data centers
+JOB_CONNECTDCS="$JOBS_DIR/go-connector-connectDCs-$POSTFIX_ID_STR.yaml"
+cp $TEMPLATES_DIR/$connectDCs $JOB_CONNECTDCS
 
-JOBS_DIR=$DEPLOYMENT_DIR/jobs/
-
-## Begin
-
-mapfile -t IPS < <(kubectl get pods -l app=$APP_LABEL,type=instance -o yaml | awk '$1 == "podIP:" { print $2 }')
-mapfile -t ANTIDOTE_NODES < <(kubectl get pods -l app=$APP_LABEL,type=instance -o yaml | awk '$1 == "podIP:" { print "antidote@"$2 }')
-
-if [ ${#ANTIDOTE_NODES[@]} -eq 0 ];
-	then
-		echo No nodes to connect. Exiting.
-		exit;
-fi
-
-## first node
-ANTIDOTE_FIRST_NODE=${IPS[0]}":8087"
-
-## build nodes string formatted
-nodes=${ANTIDOTE_NODES[@]}
-for node in $nodes
-	do
-		ANTIDOTE_NODES_STR=$ANTIDOTE_NODES_STR\,\"$node\"
-done
-ANTIDOTE_NODES_STR=${ANTIDOTE_NODES_STR:1:${#ANTIDOTE_NODES_STR}}
-
-## create connector ressource to connect this data center
-JOB_CREATEDC=$JOBS_DIR/go-connector-createDC-$APP_LABEL.yaml
-cp $TEMPLATES_DIR/$createDC $JOB_CREATEDC
-
-sed -i s/"\${antidote_datacenter}"/"$APP_LABEL"/g $JOB_CREATEDC;
-sed -i s/"\${antidote_first_node}"/"$ANTIDOTE_FIRST_NODE"/g $JOB_CREATEDC;
-sed -i s/"\${antidote_nodes}"/"$ANTIDOTE_NODES_STR"/g $JOB_CREATEDC;
-
-## 
-echo Creating data center with nodes: $ANTIDOTE_NODES_STR ...
+sed -i s/"\${antidote_datacenters}"/"$POSTFIX_ID_STR"/g $JOB_CONNECTDCS;
+sed -i s/"\${antidote_servers}"/"$ANTIDOTE_SERVERS"/g $JOB_CONNECTDCS;
 
 
-if [ $(bash ./scripts/readyProbe.sh $APP_LABEL) -eq 0 ]
-	then
-		## delete old job
-		kubectl delete job createdc-for-$APP_LABEL
-		sleep 2
-		## deploy the connector
-		kubectl apply -f $JOBS_DIR/go-connector-createDC-$APP_LABEL.yaml
-		echo Done.
-		exit;
-	else
-		echo Datacenter $APP_LABEL is not ready!
-		exit;
-fi
+## delete old job
+kubectl delete job connector-for-$POSTFIX_ID_STR
+sleep 2
+## deploy the connector
+kubectl apply -f $JOB_CONNECTDCS
+echo Done.
+exit;

@@ -20,26 +20,20 @@ createDC=go-connector-createDC-template.yaml
 
 ## Dirs
 if [ -z "$SCRIPTS_CONFIG_SRC_DIR" ]; then
+	RES_DIR=$(bash getConfig.sh resources_dir $SCRIPTS_CONFIG_SRC_DIR);
 	DEPLOYMENTS_DIR=$(bash getConfig.sh deployments_dir $SCRIPTS_CONFIG_SRC_DIR);
 	TEMPLATES_DIR=$(bash getConfig.sh templates_dir $SCRIPTS_CONFIG_SRC_DIR);
 else
+	RES_DIR=$(bash $SCRIPTS_CONFIG_SRC_DIR/getConfig.sh resources_dir $SCRIPTS_CONFIG_SRC_DIR);
 	DEPLOYMENTS_DIR=$(bash $SCRIPTS_CONFIG_SRC_DIR/getConfig.sh deployments_dir $SCRIPTS_CONFIG_SRC_DIR);
-	TEMPLATES_DIR=$(bash getConfig.sh templates_dir $SCRIPTS_CONFIG_SRC_DIR);
+	TEMPLATES_DIR=$(bash $SCRIPTS_CONFIG_SRC_DIR/getConfig.sh templates_dir $SCRIPTS_CONFIG_SRC_DIR);
 fi
 
 DEPLOYMENT_DIR=$DEPLOYMENTS_DIR/$APP_LABEL;
 
 
 ## Begin
-
-if [ ! -d $DEPLOYMENT_DIR ]; then
-	echo Could not find $DEPLOYMENT_DIR. Exiting. 
-	exit;
-fi
-
-JOBS_DIR=$DEPLOYMENT_DIR/jobs/
-
-## Begin
+JOBS_DIR=$RES_DIR/jobs/
 
 mapfile -t IPS < <(kubectl get pods -l app=$APP_LABEL,type=instance -o yaml | awk '$1 == "podIP:" { print $2 }')
 mapfile -t ANTIDOTE_NODES < <(kubectl get pods -l app=$APP_LABEL,type=instance -o yaml | awk '$1 == "podIP:" { print "antidote@"$2 }')
@@ -79,7 +73,7 @@ if [ $(bash ./scripts/readyProbe.sh $APP_LABEL) -eq 0 ]
 		kubectl delete job createdc-for-$APP_LABEL
 		sleep 2
 		## deploy the connector
-		kubectl apply -f $JOBS_DIR/go-connector-createDC-$APP_LABEL.yaml
+		kubectl apply -f $JOB_CREATEDC
 		echo Done.
 		exit;
 	else
