@@ -22,7 +22,7 @@ NUM_NODES=$2
 
 ## Configuration
 ANTIDOTE_DATACENTER="$APP_LABEL"
-IMAGE="192.168.2.106:5000\/antidotedb-local-build:0.2.2" ## needs to be sed friendly;
+IMAGE= "antidotedb/"##"192.168.2.106:5000\/antidotedb-local-build:0.2.2" ## needs to be sed friendly;
 IMAGE_PULL_POLICY="Never"
 STORAGE_CLASS_NAME="local-storage"
 
