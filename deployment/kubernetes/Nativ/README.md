@@ -18,6 +18,7 @@ If you want to build your own images, refere to [docker-antidote](https://github
 
 ### storage
 You have to define a storage class object before deploying any antidote data centers. You can use the script createStorageClass.sh to deploy the storage class template from the resources/templates directory.  
+Note, that the here presented approach does **not** provide local storage!
 More information about local storage can be found [here](https://kubernetes.io/blog/2019/04/04/kubernetes-1.14-local-persistent-volumes-ga/).
 
 ## Deployment
