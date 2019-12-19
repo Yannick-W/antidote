@@ -7,10 +7,14 @@ Antidote repository: https://github.com/AntidoteDB/antidote
 ## Overview
 
 - documentation
-	- benchmarking
+	- [benchmarking](documentation/benchmarking)
 	- deployment
-		- kubernetes
+		- [kubernetes](documentation/deployment/kubernetes)
 - deployment
 	- kubernetes
-		- [nativ](https://github.com/Yannick-W/antidote/tree/master/deployment/kubernetes/Nativ)
+		- [nativ](deployment/kubernetes/Nativ)
 		- java client library
+- benchmarking
+	- deployment
+		- kubernetes
+			- [nativ](benchmarking/deployment/kubernetes_nativ)
