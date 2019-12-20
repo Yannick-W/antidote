@@ -53,6 +53,8 @@ for node in $nodes
 	do
 		ANTIDOTE_NODES_STR=$ANTIDOTE_NODES_STR\,\"$node\"
 done
+
+#printf -v ANTIDOTE_NODES_STR "%s," "${ANTIDOTE_NODES[@]}"
 ANTIDOTE_NODES_STR=${ANTIDOTE_NODES_STR:1:${#ANTIDOTE_NODES_STR}}
 
 ## create connector ressource to connect this data center

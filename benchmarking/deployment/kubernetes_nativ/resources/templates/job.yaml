@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ${job-name}-${counter}
+  labels:
+    job: ${job-name}
+    type: antidote-benchmark-job
+spec:
+  ttlSecondsAfterFinished: 1200
+  template:
+    spec:
+      initContainers:
+      - name: init-config
+        image: alpine:latest
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: shared-data
+          mountPath: /pod-data
+        command: ["bin/echo"]
+        args: ["${configLines}", ">> benchmark.config"]
+      
+      containers:
+      - name: benchmark
+        image: ${image} #ywagner94/benchmark
+        imagePullPolicy: Always
+        - name: shared-data
+          mountPath: /opt/
+        command: ["/opt/basho_bench /opt/benchmark.config"]
+        
+  backoffLimit: 4
